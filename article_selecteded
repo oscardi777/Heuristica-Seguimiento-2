@@ -1,0 +1,720 @@
+Computers & Industrial Engineering 146 (2020) 106615
+ContentslistsavailableatScienceDirect
+Computers & Industrial Engineering
+journal homepage: www.elsevier.com/locate/caie
+Solving no-wait job-shop scheduling problems using a multi-start simulated
+T
+annealing with bi-directional shift timetabling algorithm
+Kuo-Ching Yinga, Shih-Wei Linb,c,d,⁎
+aDepartmentofIndustrialEngineeringandManagement,NationalTaipeiUniversityofTechnology,Taipei,Taiwan
+bDepartmentofInformationManagement,ChangGungUniversity,Taoyuan,Taiwan
+cDepartmentofIndustrialEngineeringandManagement,MingChiUniversityofTechnology,Taipei,Taiwan
+dDepartmentofNeurology,LinkouChangGungMemorialHospital,Taoyuan,Taiwan
+ARTICLE INFO ABSTRACT
+Keywords: Thispaperpresentsamulti-startsimulatedannealingwithbi-directionalshifttimetabling(MSA-BST)algorithm
+Scheduling for solving the no-wait jobshop scheduling problem (NWJSP). To enhance the quality of the solution, a bi-
+No-waitjob-shop directionalshifttimetablingprocedurethatallowsdelaytimetablingandconsequentlyenlargesthesearchspace
+Makespan is embeddedintothemulti-startsimulatedannealingalgorithm.Theperformanceof theproposedMSA-BST
+Metaheuristic
+algorithmisevaluatedwithrespecttothemakespanbycomparingitscomputationalresultstothoseofthebest-
+to-date meta-heuristic algorithm, the hybrid artificial bee colony (HABC) algorithm, in the literature.
+Experimentalresultsthatwereobtainedbyapplyingtheproposedalgorithmtoasetofbenchmarkproblemsin
+theliteratureindicatethatitsignificantlyoutperformsHABC.Themaincontributionofthisstudyistoprovidea
+novelandeffectivealternativemethodforsolvingthecomplexNWJSP.
+1. Introduction schedulingproblem.Thisistheprimarymotivationforthisstudy.
+Tothebestofourknowledge,HallandSriskandarajah(1996)were
+This study concerns the no-wait job-shop scheduling problem the first to summarize research on the NWJSP. Allahverdi (2016)
+(NWJSP) with the objective of minimizing makespan among all jobs, comprehensively surveyed the literature on the J m |nwt|C max problem.
+which can be denoted as the triplet J m |nwt|C max, where J m denotes a SincetheJ m |nwt|C maxproblemisNP-hardinthestrongsense(Bansal,
+machineenvironmentthatisajob-shopwithmmachines;nwtindicates Mahdian, & Sviridenko, 2005) when each job has at least three op-
+thejob-shopschedulingproblemwiththeno-waitconstraint,andC max erations, it does not has a polynomial-time approximation scheme,
+indicatesthattheobjectiveistominimizethemakespan.TheNWJSPis unlessP=NP.Exactmethods,suchasbranch-and-boundalgorithms
+anextensionoftheclassicaljob-shopschedulingproblem(JSP)under (Mascis & Pacciarelli, 2002; AitZai, Benmedjdoub, & Boudhar, 2016),
+theno-waitconstraint,whichariseswhenthecharacteristicsofprocess integerlinearprogramming(Vermeulen,Hoogeveen,&vandenAkker,
+technologyortheabsenceofstoragecapacityrequiresthatconsecutive 2011),constraintprogramming(Vermeulenetal.,2011)anddynamic
+operationsinanyjobareprocessedoneafteranotherwithoutwaiting. programming (Ozolins, 2018) only can solve small problems to op-
+TheJ m |nwt|C maxproblem,addressedherein,arisesinseveralindustries, timalitywithinareasonabletime.Onaccountofthecomplexityofthe
+includingsteelproduction,chemicalandpharmaceuticalmanufacture, J m |nwt|C max problem, the majority of relevant studies seek to develop
+semiconductortesting,computersystemdevelopmentandtheproduc- approximate algorithms that can obtain near-optimal solutions to the
+tionofconcretewares(Zhu&Li,2012;Sundar,Suganthan,Jin,Xiang, problem in a reasonable time. These approximate algorithms usually
+&Soon,2017).GiventhecomplexitiesoftheJ m |nwt|C max problem,ef- decomposetheproblemintotwosub-problems–thesequencingandthe
+ficientheuristicsareneededtohelpgeneratedependablesolutionsfor timetabling problems. The sequencing problem is to find an optimal
+practicalindustrial-scaleapplications.Althoughthisproblemhaswide processingsequenceofjobs,whereasthetimetablingproblemistofind
+industrialapplications,muchlessattentionhasbeenpaidtoitthanhas optimalstartingtimesforthejobsinagivenprocessingsequencethat
+beenpaidtotheclassicalJSP.Thisstudy’sreviewofthelimitedstudies yieldtheminimummakespan.
+intheliteraturesuggeststhatthereisroomforfurtherimprovingthe Themajorityoftheapproximatealgorithmsintheliteraturesolve
+qualityofsolutionstofacilitateindustrialapplicationsofthisemerging the J m |nwt|C max problem by using meta-heuristic algorithms. For
+⁎Correspondingauthorat:DepartmentofInformationManagement,ChangGungUniversity,Taoyuan,Taiwan.
+E-mailaddress:swlin@mail.cgu.edu.tw(S.-W.Lin).
+https://doi.org/10.1016/j.cie.2020.106615
+Received16July2019;Receivedinrevisedform14June2020;Accepted16June2020
+Available online 27 June 2020
+0360-8352/ © 2020 Elsevier Ltd. All rights reserved.
+
+K.-C.YingandS.-W.Lin Computers & Industrial Engineering 146 (2020) 106615
+example, Brizuela, Zhao, and Sannomiya (2001) proposed a genetic
+algorithm (GA) with a simple decoding technique to solve the
+J m |nwt|C max problem. Experimental results revealed that GA easily
+solved problems that were larger than usual. Later, Schuster and
+Framinan (2003) used a fast deterministic variable neighborhood
+searchalgorithm(VNS)andahybridizationofGAwithsimulatedan-
+nealing (GASA) to improve the convergence of the solutions. Their
+computational results demonstrated that VNS and GASA algorithms Fig.1.Exampleofasolutionrepresentation.
+comparedextremelyfavorablytotheresultsintheliterature.Schuster
+(2006)presentedsomenewtheoreticalpropertiesrelatedtothecom-
+Table1
+plexity of the two sub-problems of J m |nwt|C max, and showed both the Anexampleof4Jobs*4Machines.
+sequencingandthetimetablingproblemswereNP-hardinthestrong
+Job Machinesequence(time)
+sense.HepresentedafastTabusearch(FTS)algorithmforsolvingthe
+J m |nwt|C max problem that compared extremely favorably to the best J1 4(7)→3(9)→1(8)→2(4)
+existingalgorithms. J2 1(4)→4(8)→2(2)→3(4)
+In the same year, Framinan and Schuster (2006) proposed a new J3 3(5)→2(7)→1(1)→4(4)
+timetabling procedure, and embedded it into a meta-heuristic named J4 4(3)→2(1)→1(2)→3(3)
+“completelocalsearchwithmemory”(CLM)forsolvingtheJ
+m
+|nwt|C
+max
+problem. Comparing the computational results of CLM with those of the J m |nwt|C max problem.Experimentalresultsonasetofbenchmarks
+existing meta-heuristics confirmed the effectiveness of the CLM algo-
+revealed that the mix-D/GA algorithm produced competitive results
+rithm.Zhu,Li,andWang(2009)developedthecompletelocalsearch
+with those produced by CLLM, MCLM and HABC. To the best of our
+withlimitedmemory(CLLM)algorithmwithanintegratedshifttime-
+knowledge,intheexistingliterature,CLLM,MCLMandHABCarebyfar
+tabling procedure to solve efficiently the J m |nwt|C max problem. Their the best meta-heuristics for solving the J m |nwt|C max problem. Accord-
+experimental results demonstrated that CLLM outperformed VNS
+ingly, this study uses them as benchmark algorithms to evaluate the
+(Schuster&Framinan,2003),GASA(Schuster&Framinan,2003)and
+performanceofthemeta-heuristicthatisproposedherein.
+CLM (Framinan & Schuster, 2006) and required only slightly more
+The rest of this paper is organized as follows: Section 2 formally
+computationtime. defines the J m |nwt|C max problem of interest. Section 3 describes the
+Bożejko and Makuchowski (2009) proposed a hybrid Tabu search
+proposed multi-start simulated annealing with bi-directional shift
+(HTS)algorithmtosolvethiscomplexproblem.Acomparativeanalysis
+timetabling (MSA-BST) algorithm. Section 4 provides a comparative
+revealedthatHTSfoundmuchbettersolutionsthanGASA(Schuster&
+analysis of the results that are obtained using the proposed MSA-BST
+Framinan,2003)andFTS(Schuster,2006)algorithmsinacomparable
+algorithm with those yielded by the best-to-date meta-heuristic algo-
+time. Pan and Huang (2009) presented a hybrid genetic algorithm
+rithm. Finally, Section 5 provides a general conclusion and re-
+(HGA) to improve the efficiency of the traditional GA for solving the
+commendationsforfutureresearch.
+J m |nwt|C max problem.ThecomputationalresultsshowedthatHGA ac-
+celerated convergence and outperformed GA for large test instances.
+Also,Santosa,Budiman,andWiratno(2011)proposedahybridmeta- 2. Problemdefinition
+heuristic named cross entropy with genetic algorithm (CEGA). Their
+results demonstrated that CEGA provided better or at least as good TheJ m |nwt|C max probleminvolvesafinitesetJofindependentjobs
+makespansthanthoseprovidedbyGASA(Schuster&Framinan,2003) thathavetobeprocessedonasetMofmachines.Eachjob j(j J)has
+andHTS(Bożejko&Makuchowski,2009),especiallyforsmalltestin- itsownprocessingorder{O j1 ,O j2 , ...,O jnj },wheren jisthetotalnumber
+stances. Bożejko and Makuchowski (2011) presented a GA with an ofoperationsinjob j.Eachoperationmustbeprocessedonaspecified
+automatic adjustment mechanism. They showed that this algorithm machine. Operation O jk (j J; k=1,2, ...,n j ) of job j requires the
+outperformedtheGASAofSchusterandFraminan(2003). exclusiveuseofmachineM l (M l M),onwhichitmustbeprocessed
+ZhuandLi(2012)remodeledthe J m |nwt|C max problembyintrodu- without interruption for P jk time units. Every job must be processed
+cing time difference, and presented a modified complete local search withoutwaitingbetweenthefinalizationofoneoperationandthebe-
+withmemory(MCLM)thatusedanefficientshiftpenalty-basedtime- ginningofthenext.Hence,oncethefirstoperationofanyjobisbegun,
+tabling method. Experimental results revealed that MCLM out- the job must be processed operation by operation until all of its op-
+performed CLM (Framinan & Schuster, 2006) and CLLM (Zhu et al., erationshavebeencompleted.Ifnecessary,thestartingtimeofthefirst
+2009). Li, Xu, and Li (2016) solved the J m |nwt|C max problem using a operation must be postponed so that each job can be processed con-
+complete local search with a memory and variable neighborhood tinuously from its start to its completion. The following critical as-
+structure (CLMMV) that integrated an alternative delay timetabling sumptionsaremadeintheaddressedJ m |nwt|C max problem.
+method. Their analytical results indicated that CLMMV could find si-
+milarsolutionstoCLLM(Zhuetal.,2009)inshortercomputationtimes. • Each job has only one feasible sequence of operations and each
+AitZai et al. (2016) adapted the particle swarm optimization (PSO) operationmustbeperformedonasinglemachine.
+algorithmandobtainedbetterresultsthantheheuristicsofMascisand • Nomachinecanbeusedmorethanonceinajob.
+Pacciarelli(2002). • Alljobsareavailableatthebeginningoftheplanninghorizon.
+Sundaretal.(2017)proposedahybridartificialbeecolony(HABC) • Allmachinesareavailablethroughouttheplanninghorizon.
+algorithmthatintegratedanartificialbeecolonyalgorithmwithalocal • Allmachinesaredifferentandtheirprocessingspeedsareconstant.
+searchtofindhigh-qualitysolutionstothe J m |nwt|C max problem.They • Nomachinemayprocessmorethanoneoperationatonce.
+investigated its performance on standard benchmark instances of the • No job may be processed by more than one machine at the same
+problem and found that HABC outperformed the best twometa-heur- time.
+istics—CLLM(Zhuetal.,2009)andMCLMZhuandLi(2012)—inthe • Theoperationsofdifferentjobshavenoprecedenceconstraints.
+literature.Valenzuela,Brizuela,Cosío-León,andRomero-Ocaño(2019) • The processing time may vary among operations, but it is known
+presented a genetic algorithm with the mixed standard and reverse andfixedforanygivenoperation.
+timetabling method(mix-D/GA), which can find bettersolutions than
+whenusingthedirectorthereversetimetablingseparatelyforsolving Givenalloftheaboveconstraints,theobjectiveistofindafeasible
+2
+
+K.-C.YingandS.-W.Lin Computers & Industrial Engineering 146 (2020) 106615
+Fig.2.Theoptimalsolutionfortheexample,obtainedbyapplyingthebi-directionalshifttimetablingprocedure.
+Fig.3.Thebestsolutionsfortheexample,obtainedbyapplyingtheforwardandbackwardnon-delaytimetablingprocedures,respectively.
+timetable schedule for all jobs that minimizes the makespan iteration, a neighborhood solution is generated from the incumbent
+C =max{C },whereC denotesthecompletiontimeofthefinalop- solution,andthenadecisionismadeprobabilisticallytoreplaceornot
+| max | j j |     |     |     |     |     |     |     |     |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+eration of job j. Let S (j J; k=1,2, ...,n ) be the starting time of to replace the incumbent solution with the new one, from which the
+|     | jk  |     | j   |     |     |     |     |     |     |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+operationO jk,andMbeasufficientlylargepositivenumber.Basedon searchprocesswillcontinue.Typically,thisstepisrepeateduntilapre-
+| the MILP | model of Brizuela | et al. (2001), | the J |nwt|C | problem |     |     |     |     |     |
+| -------- | ----------------- | -------------- | ------------ | ------- | --- | --- | --- | --- | --- |
+m max specified computation budget has been exhausted. In this study, an
+consideredhereincanbeformallyspecifiedasfollows. effective multi-start simulated annealing with bi-directional shift
+=max{S } timetabling (MSA-BST) algorithm, which integrates the advantages of
+| Minimize | C max jnj | +P jnj |     |     |     |     |     |     |     |
+| -------- | --------- | ------ | --- | --- | --- | --- | --- | --- | --- |
+j J (1) theSAalgorithm,themulti-starthillclimbingstrategyandabi-direc-
+|     |     |     |     |     | tional shift | timetabling | procedure, | is proposed | for solving the |
+| --- | --- | --- | --- | --- | ------------ | ----------- | ---------- | ----------- | --------------- |
+subjectto
+|     |     |     |     |     | J m |nwt|C max | problem.Thefollowingsubsectionsdiscussthemulti-start |     |     |     |
+| --- | --- | --- | --- | --- | -------------- | ---------------------------------------------------- | --- | --- | --- |
+S +P =S , k=1,2,...,n 1,j J, initialization, solution representation, bi-directional shift timetabling
+| jk jk | jk+1 | j   |     | (2) |     |     |     |     |     |
+| ----- | ---- | --- | --- | --- | --- | --- | --- | --- | --- |
+procedure,neighborhoods,anddetailsoftheMSA-BSTprocedure.
+| S +P S | +My, j,j | J,i M, |     |     |     |     |     |     |     |
+| ------ | -------- | ------ | --- | --- | --- | --- | --- | --- | --- |
+| ji ji  | ji       |        |     | (3) |     |     |     |     |     |
+S ji +P ji S ji +M(1 y), j,j J,i M, (4) 3.1. Multi-startinitializationandsolutionrepresentation
+|           |                   |         |     |     | Inthiswork,theinitialsolutionsetP={ |         |            | ,...,        | }isgeneratedran- |
+| --------- | ----------------- | ------- | --- | --- | ----------------------------------- | ------- | ---------- | ------------ | ---------------- |
+| y {0,1};S | jk 0, k=1,2,...,n | j ,j J. |     | (5) |                                     |         |            | 1            | p                |
+|           |                   |         |     |     |                                     | p       |            |              | P.               |
+|           |                   |         |     |     | domly, where                        | denotes | the number | of solutions | in A solution q  |
+Constraint(1)definesthemakespanoftheschedule.Constraintset (q=1, ...,p)isrepresentedbyastringofnumbersconsistingofthree
+(2)isno-waitconstraintsonconsecutiveoperations.Constraintsets(3) segments,whichhaven,1and1element(s),respectively.Theelement
+and(4)guaranteethateveryjobisassignedtoonepositioninthese- (s)inthefirst,secondandthirdsegmentscorrespondtothesequenceof
+quenceofjobs.Constraintset(5)definesthedomainofvariableyand n jobs,thetimetablingprocedureused,andtheselectedjobtobede-
+therangesofthestartingtimesofalloperations. layed,respectively.Inthefirstsegment,therandompermutationofn
+jobsisgeneratedusingtheFisher–Yatesshuffle(Fisher&Yates,1948).
+3. Proposedmulti-startsimulatedannealingwithbi-directional Any permutation of n jobs will be produced by this algorithm with a
+shifttimetablingalgorithm probabilityofexactly1/n!,thusyieldingauniformdistributionoverall
+|     |     |     |     |     | such permutations. | Inthe | second | segment, a random | binary variable, |
+| --- | --- | --- | --- | --- | ------------------ | ----- | ------ | ----------------- | ---------------- |
+direction,isgeneratedtoindicatewhichtimetablingprocedurewillbe
+| Based ona | concept of Metropolis, | Rosenbluth, | Rosenbluth, | Teller, |     |     |     |     |     |
+| --------- | ---------------------- | ----------- | ----------- | ------- | --- | --- | --- | --- | --- |
+direction=0,
+and Teller (1953) that was inspired by annealing in metallurgy, used to decode the sequence. If then the forward time-
+Kirkpatrick et al. (1983) proposed the classical simulated annealing tabling procedure will be used; otherwise, the backward timetabling
+(SA)algorithm.TheproceduresofexecutingtheclassicalSAalgorithm procedurewillbeused.Theforwardandbackwardtimetablingproce-
+usually begin with a randomly generated initial solution. At each duresaredescribedinsection3.2.Themotivationforembeddingthebi-
+3
+
+K.-C.YingandS.-W.Lin Computers & Industrial Engineering 146 (2020) 106615
+Fig.4.Pseudo-codeoftheproposedMSA-BSTalgorithm.
+directionalshifttimetablingprocedureintotheproposedalgorithmisto direction=0meansthattheforwardtimetablingprocedurewillbeused
+enlargethesearchspace,andthusfindbettersolutionswithinthegiven to decodethe sequence; Inthe third segment, j =5 indicates that
+delay
+processing sequences. In the third segment, a random variable, j delay, thestarting processingtime ofthefirstoperation of job5willbe de-
+varying from 1 to 4n, is generated to indicate the delayed job. If layedforoneunitoftime.
+| j [1,n], | then the | earliest possible | processing time | of the first |     |     |     |     |
+| -------- | -------- | ----------------- | --------------- | ------------ | --- | --- | --- | --- |
+delay
+operationofjobj delaywillbedelayed;otherwise,nooperationofanyjob 3.2. Bi-directionalshifttimetablingprocedure
+| in the sequence | will be         | delayed. Therefore, | the probability | that a se-   |                |                  |                      |             |
+| --------------- | --------------- | ------------------- | --------------- | ------------ | -------------- | ---------------- | -------------------- | ----------- |
+| lected job      | will be delayed | is 25%. Due to      | the complexity  | of the shift |                |                  |                      |             |
+|                 |                 |                     |                 |              | In this study, | a bi-directional | (forwardandbackward) | shift time- |
+timetabling method, calculating delay timetables consumes more tablingprocedureisusedtodecodethestartingtimeofeachjobina
+sizen
+computing time as therange ofdelay times orthe problem in- given processing sequence. The proposed bi-directional shift time-
+crease.Totrade-offsolutionqualityandcomputingtimeinthisstudy, tablingprocedureisbrieflydescribedasfollows.
+| the firstoperation | of the | selected job is delayed | for one | unitof time. |     |     |     |     |
+| ------------------ | ------ | ----------------------- | ------- | ------------ | --- | --- | --- | --- |
+Fig.1displaysanexampleofthesolutionrepresentation.Thepermu- Step1.Settheidletimeintervalofeachmachineas[0, ).
+tationlistoftenjobsinthefirstsegmentrevealsthatthesejobsaretobe Step2.Sequentiallypickjobsfromthejobsequenceasspecifiedby
+processedinthesequence7-9-2-1-5-6-10-3-4-8;Inthesecondsegment, theindicativevariabledirection=0or1,untilalljobsinthesequence
+4
+
+K.-C.YingandS.-W.Lin Computers & Industrial Engineering 146 (2020) 106615
+|     |     |     |     |     | ofthe | picked | job isdelayeduntil |     | the | processingtimes |     | of all | ofits |
+| --- | --- | --- | --- | --- | ----- | ------ | ------------------ | --- | --- | --------------- | --- | ------ | ----- |
+operationsfallwithintheidletimeintervalsoftheircorresponding
+|     |     |     |     |     | machines | without | violating | the | no-wait | constraint. |     | The idle | time |
+| --- | --- | --- | --- | --- | -------- | ------- | --------- | --- | ------- | ----------- | --- | -------- | ---- |
+intervalsofeverymachineareupdatedafterthestartingtimeofthe
+pickedjobisset.
+Thebi-directionalshifttimetablingprocedurecanbeillustratedby
+applyingittothedatainTable1.Itisassumedthatthepermutationlist
+obtainedbytheproposedMSA-BSTis(341201),whichmeansthejob
+|     |     |     |     |     | processing | sequence | is 3–4-1–2. | In  | addition, | direction=0 |     | means | that |
+| --- | --- | --- | --- | --- | ---------- | -------- | ----------- | --- | --------- | ----------- | --- | ----- | ---- |
+theforwardtimetablingprocedureisusedtodecodethesequence,and
+j =1indicatesthatthestartingprocessingtimeofthefirstopera-
+delay
+tionofJob1willbedelayedforoneunitoftime.FromtheGanttchart
+showninFig.2,themakespanofthedecodedsequenceis34,whichis
+theoptimalsolution,verifiedbyimplementingtheMILPmodel.Itcan
+befoundthatifthestartingprocessingtimeofthefirstoperationofJob
+1isnotdelayedby1time-unit,thestartingprocessingtimeofthethird
+Fig.5.Pseudo-codeofthelocalsearchprocedure. operationofJob2willbedelayed,andthusthemakespanwillincrease.
+Furthermore,allpossiblejobsequencesintheexampleareenumerated
+|     |     |     |     |     | by applying | the | forward | and backward |     | non-delay | timetabling |     | proce- |
+| --- | --- | --- | --- | --- | ----------- | --- | ------- | ------------ | --- | --------- | ----------- | --- | ------ |
+Table2
+dures,andtheirbestsolutions,(1234)and(3124),respectivelyare
+OrthogonalarrayandtheobtainedRPDs.
+|     |            |     |      |     | obtained. | As shown | in Fig. | 3, the | best makespan |     | values | obtained | by  |
+| --- | ---------- | --- | ---- | --- | --------- | -------- | ------- | ------ | ------------- | --- | ------ | -------- | --- |
+|     | p T0 Iiter |     | Nnon |     |           |          |         |        |               |     |        |          |     |
+ExperimentNo. improving RPD applyingtheforwardandbackwardnon-delaytimetablingprocedures
+are41and37,respectively,whichislargerthantheoptimalsolution
+| 1   | 3 45 6000n* | 0.96 | 0.6n | 2.4042 |     |     |     |     |     |     |     |     |     |
+| --- | ----------- | ---- | ---- | ------ | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+obtainedbyapplyingthebi-directionalshifttimetablingprocedure.Itis
+| 2   | 3 50 8000n  | 0.97 | 0.8n | 1.8656 |             |       |             |         |        |     |                |     |       |
+| --- | ----------- | ---- | ---- | ------ | ----------- | ----- | ----------- | ------- | ------ | --- | -------------- | --- | ----- |
+|     |             |      |      |        | intuitively | quite | clear that, | in some | cases, | the | bi-directional |     | shift |
+| 3   | 3 55 10000n | 0.98 | 1.0n | 1.6923 |             |       |             |         |        |     |                |     |       |
+4 3 60 12000n 0.99 1.2n 1.8268 timetabling procedure allows the exploitation of new schedules that
+| 5   | 5 45 8000n | 0.98 | 1.2n | 1.5534 |     |     |     |     |     |     |     |     |     |
+| --- | ---------- | ---- | ---- | ------ | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+cannotbeobtainedbythenon-delaytimetablingmethodsforthepro-
+| 6   | 5 50 6000n  | 0.99 | 1.0n | 2.1590 |           |        |           |        |          |       |          |          |     |
+| --- | ----------- | ---- | ---- | ------ | --------- | ------ | --------- | ------ | -------- | ----- | -------- | -------- | --- |
+|     |             |      |      |        | blem, and | it can | thus find | better | starting | times | for jobs | in order | to  |
+| 7   | 5 55 12000n | 0.96 | 0.8n | 1.5279 |           |        |           |        |          |       |          |          |     |
+8 5 60 10000n 0.97 0.6n 2.1525 realizetheminimummakespanwithinthegivenprocessingsequence.
+9 7 45 10000n 0.99 0.8n 2.1198 Notethattheproposedbi-directionalshifttimetablingmethoddif-
+10 7 50 12000n 0.98 0.6n 2.0658 fersfromthetimetablingmethodsusedinCLM(Framinan&Schuster,
+| 11  | 7 55 6000n | 0.97 | 1.2n | 1.6905 |     |     |     |     |     |     |     |     |     |
+| --- | ---------- | ---- | ---- | ------ | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+2006),CLLM(Zhuetal.,2009),MCLM(Zhu&Li,2012),CLMMV(Li
+| 12  | 7 60 8000n  | 0.96 | 1.0n | 1.6211 |                |      |          |                |     |             |          |     |         |
+| --- | ----------- | ---- | ---- | ------ | -------------- | ---- | -------- | -------------- | --- | ----------- | -------- | --- | ------- |
+|     |             |      |      |        | et al., 2016), | and  | mix-D/GA | (Valenzuela    |     | et al.,     | 2019).   | The | inverse |
+| 13  | 9 45 12000n | 0.97 | 1.0n | 1.3476 |                |      |          |                |     |             |          |     |         |
+|     |             |      |      |        | timetabling    | used | in CLM   | is a non-delay |     | timetabling | obtained |     | by the  |
+| 14  | 9 50 10000n | 0.96 | 1.2n | 1.3063 |                |      |          |                |     |             |          |     |         |
+15 9 55 8000n 0.99 0.6n 2.7474 inverse processing sequence of the inverse instance. The shift time-
+16 9 60 6000n 0.98 0.8n 2.4359 tablingmethodusedinCLLMgeneratesatimetablebyperformingright
+|     |     |     |     |     | shift or leftshift |     | strategies | oneach | job. The | shift | penalty-based |     | time- |
+| --- | --- | --- | --- | --- | ------------------ | --- | ---------- | ------ | -------- | ----- | ------------- | --- | ----- |
+* ndenotesthenumberofjobs.
+|     |     |     |     |     | tabling method        | used | in MCLM | constructs |          | two initial | timetables |              | from |
+| --- | --- | --- | --- | --- | --------------------- | ---- | ------- | ---------- | -------- | ----------- | ---------- | ------------ | ---- |
+|     |     |     |     |     | time difference-based |      | sets,   | and        | improves | them        | by an      | investigated |      |
+Table3
+timetabletighteningmethod.Byalternativelyadoptingthe“asearlyas
+ARPDsobtainedbydifferentlevelsofeachparameter.
+|     |     |     |     |     | possible” | or the | “as late | as possible” | rules, | the | improved | non-delay |     |
+| --- | --- | --- | --- | --- | --------- | ------ | -------- | ------------ | ------ | --- | -------- | --------- | --- |
+Nnon
+Level p T0 Iiter λ improving timetabling method used in CLMMV is identical to non-delay time-
+|          |        |        |        |        | tabling, with | the | exception | that it | does | not include | the | ordinal | con- |
+| -------- | ------ | ------ | ------ | ------ | ------------- | --- | --------- | ------- | ---- | ----------- | --- | ------- | ---- |
+| 1 1.9472 | 1.8563 | 2.1724 | 1.7149 | 2.3425 |               |     |           |         |      |             |     |         |      |
+straint,i.e.,thestartingtimeofthesuccessorjobcannotbelessthanits
+| 2 1.8482 | 1.8492 | 1.9469 | 1.7640 | 1.9873 |             |         |         |            |           |     |           |          |     |
+| -------- | ------ | ------ | ------ | ------ | ----------- | ------- | ------- | ---------- | --------- | --- | --------- | -------- | --- |
+|          |        |        |        |        | predecessor | job for | a given | processing | sequence. |     | The mixed | standard |     |
+| 3 1.8743 | 1.9145 | 1.8177 | 1.9369 | 1.7050 |             |         |         |            |           |     |           |          |     |
+4 1.9593 2.0091 1.6920 2.2133 1.5943 and reverse timetabling methods used in the mix-D/GA algorithm do
+Range 0.1111 0.1599 0.4804 0.4984 0.7482 not include the shift timetabling mechanism. Moreover, the reverse
+Rank 5 4 3 2 1 timetablingofthemix-D/GAalgorithmdecodestheorderofoperations
+inacompletelyreversedsequence,andthenre-calculatesthestartand
+have been selected. If direction=0, then theforward timetabling end times for all operations of a given job. That is, the reverse time-
+procedureisusedtodecodethestartingtimesofoperationsfromthe tabling is not equivalent to the backward timetabling procedure de-
+leftofthejobsequencetotheright,andthejobsinthesequenceare scribedinthispaper.
+| processedonebyone,asdeterminedbytheiroperation |     |     |     | sequences |     |     |     |     |     |     |     |     |     |
+| ---------------------------------------------- | --- | --- | --- | --------- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+3.3. Neighborhoods
+onthemachines.Otherwise,thebackwardtimetablingprocedureis
+usedtodecodethestartingtimesofoperationsfromtherightofthe
+|                                                          |     |     |     |     | LetN( | )representthesetsofsolutionsthatneighborthesolution |     |     |     |     |     |     |     |
+| -------------------------------------------------------- | --- | --- | --- | --- | ----- | --------------------------------------------------- | --- | --- | --- | --- | --- | --- | --- |
+| jobsequencetotheleft,andthejobsinthesequenceareprocessed |     |     |     |     |       | q                                                   |     |     |     |     |     |     |     |
+q(q=1, ...,p),whichcanbegeneratedusingswap,insertion,2-swap,
+| one by one, | as determined | by the reverse | of their operation | se- |              |              |     |           |        |       |         |            |     |
+| ----------- | ------------- | -------------- | ------------------ | --- | ------------ | ------------ | --- | --------- | ------ | ----- | ------- | ---------- | --- |
+|             |               |                |                    |     | 2-insertion, | or inversion |     | operators | (Chen, | 2006; | Bozejko | & Wodecki, |     |
+quencesonthemachines.Findtheearlieststartingtimesofallop-
+erations of the picked job that satisfy the delay requirement in- 2006;Lin&Ying,2015).Theswapoperatorrandomlyselectstwojobs
+dicatedbythevariable j delay,theidletimeintervalsofthemachines in q and switches their positions. The insertion operator randomly
+andtheprocessingtimesofalloperationsofthepickedjobwithout selectsone jobin q andinsertsitinthepositionimmediatelybefore
+violatingtheno-waitconstraint.Iftheprocessingtimesofanyop- another randomly selected job in q. The 2-swap and 2-insertion op-
+erationsofthepickedjobdonotsatisfytheidletimeintervalsofthe eratorsexecuteswapandinsertionoperationstwice,respectively.The
+correspondingmachines,thenthestartingtimeofthefirstoperation inversion operator randomly selects a substring in q and reverses its
+order.
+5
+
+K.-C.YingandS.-W.Lin Computers & Industrial Engineering 146 (2020) 106615
+Table4
+Comparisonofresultsobtainedbycomparedalgorithms(small-sizedtestproblems).
+|     |     | CLLM |     |     | MCLM |     | HABC |     | MSA-BST |     | TEM_F | TEM_B |     |
+| --- | --- | ---- | --- | --- | ---- | --- | ---- | --- | ------- | --- | ----- | ----- | --- |
+Problem (n,m) BKS BRPD APRD ACT BRPD APRD ACT Cmax BRPD ARPD ACT Cmax BRPD ARPD ACT Cmax RPD Cmax RPD
+Ft06 (6,6) 73 0.00 0.00 0.00 0.00 0.00 0.00 73 0.00 0.00 0.11 73 0.00 0.00 0.54 73 0.00 73 0.00
+La01 (10,5) 971 0.00 0.10 9.83 0.00 0.02 3.19 975 0.41 0.41 0.55 971 0.00 0.00 2.00 975 0.41 971 0.00
+La02 (10,5) 937 0.00 0.21 23.17 0.00 0.00 5.34 961 2.56 2.56 0.99 937 0.00 0.00 1.82 961 2.56 937 0.00
+La03 (10,5) 820 0.00 0.00 8.43 0.00 0.00 2.18 820 0.00 0.00 0.49 820 0.00 0.00 1.80 820 0.00 820 0.00
+La04 (10,5) 887 0.00 0.00 23.87 0.00 0.00 4.39 887 0.00 0.00 0.61 887 0.00 0.00 1.71 887 0.00 887 0.00
+La05 (10,5) 777 0.00 0.50 5.62 0.51 0.90 2.74 781 0.51 0.51 0.80 777 0.00 0.00 1.56 781 0.51 777 0.00
+Ft10 (10,10) 1607 0.00 0.00 64.60 0.00 0.00 5.51 1607 0.00 0.00 6.92 1607 0.00 0.00 3.46 1607 0.00 1609 0.12
+Orb01 (10,10) 1615 0.00 0.00 50.55 0.00 0.00 4.67 1615 0.00 0.00 5.62 1615 0.00 0.00 3.37 1615 0.00 1626 0.68
+Orb02 (10,10) 1485 0.00 1.89 33.70 2.16 2.16 4.70 1485 0.00 0.00 4.82 1485 0.00 0.22 3.78 1485 0.00 1518 2.22
+Orb03 (10,10) 1599 0.00 0.00 49.85 0.00 0.00 9.65 1599 0.00 0.00 7.07 1599 0.00 0.00 3.44 1599 0.00 1599 0.00
+Orb04 (10,10) 1653 0.00 0.42 28.09 0.00 0.12 5.51 1653 0.00 0.00 3.71 1653 0.00 0.00 3.88 1653 0.00 1653 0.00
+Orb05 (10,10) 1365 0.15 0.15 9.83 0.00 0.00 5.97 1370 0.37 0.37 3.35 1365 0.00 0.14 3.75 1370 0.37 1367 0.15
+Orb06 (10,10) 1555 0.00 0.00 30.89 0.00 0.00 2.49 1555 0.00 0.00 4.04 1555 0.00 0.00 3.62 1555 0.00 1557 0.13
+Orb08 (10,10) 1319 0.00 0.00 42.13 0.00 0.00 4.49 1319 0.00 0.00 6.31 1319 0.00 0.00 3.20 1319 0.00 1319 0.00
+Orb09 (10,10) 1445 0.00 0.83 13.34 0.00 0.00 2.98 1445 0.00 0.28 2.88 1445 0.00 0.00 3.59 1445 0.00 1445 0.00
+Orb10 (10,10) 1557 0.00 0.00 48.45 0.00 0.00 8.32 1557 0.00 0.00 3.87 1557 0.00 0.09 4.36 1557 0.00 1564 0.45
+La16 (10,10) 1575 0.00 0.00 28.79 1.84 1.84 3.97 1575 0.00 0.00 3.81 1575 0.00 0.00 3.39 1575 0.00 1575 0.00
+La17 (10,10) 1371 0.00 0.22 37.21 0.00 0.12 8.32 1384 0.95 0.95 3.24 1371 0.00 0.00 3.56 1384 0.95 1371 0.00
+La18 (10,10) 1417 0.00 1.13 35.81 2.82 2.82 4.32 1417 0.00 5.22 5.01 1417 0.00 0.79 3.97 1417 0.00 1417 0.00
+La19 (10,10) 1482 0.00 0.14 11.23 0.00 0.61 3.51 1482 0.00 0.43 2.42 1482 0.00 0.49 3.78 1482 0.00 1491 0.61
+La20 (10,10) 1526 0.00 0.13 4.21 1.31 1.31 3.79 1526 0.00 0.00 2.11 1526 0.00 0.00 3.45 1526 0.00 1580 3.54
+Average 0.01 0.27 26.65 0.41 0.47 4.57 0.23 0.51 3.27 0.00 0.08 3.13 0.23 0.38
+3.4. ProceduresofMSA-BST 2.67GHzandwith20GBofRAM.Thefollowingsubsectionsdiscussthe
+testproblems,parameterselection,andexperimentalresults.
+Fig.4showstheprocedureforimplementingtheproposedMSA-BST
+algorithm. First, after the parameter values have been set, the initial 4.1. Testproblems
+P={ ,..., }
+| solution set | 1   | p is generated |     | randomly. | At each | iteration, | a   |     |     |     |     |     |     |
+| ------------ | --- | -------------- | --- | --------- | ------- | ---------- | --- | --- | --- | --- | --- | --- | --- |
+israndomlyselectedfromP,
+solution q andaneighborhoodsolution Sundaretal.(2017)usedtheclassicaljob-shopstandardbenchmark
+N( )
+q q is generated by applying a swap, insertion, 2-swap, 2-in- probleminstances(Beasley,1990)withno-waitconstraintstoevaluate
+sertion, orinversionoperator.Since thereare avery largenumberof theperformanceofCLLM,MCLMandHABC.Theseinstancesareused
+combinationsoftheseoperators,Step3.2fixestheprobabilityofper- herein to verify the performance of the proposed MSA-BST. They are
+forminganyoneoftheoperatorsat0.2inordertosimplifythepara- groupedintosetsofsmallandlargeprobleminstancesthathave21and
+meterssettings.Afteroneofthefiveoperatorsisperformed,theseisa 40 test instances, respectively. For the small problem instances, the
+0.01 probability to change thedirection of q and 0.01 probability to numberofjobsvariesfromsixtotenandthenumberofmachinesvaries
+| changethe | j delayof | q.LetC max ( | q )andC | max ( | )bethethemakespanof |     |     |     |     |     |     |     |     |
+| --------- | --------- | ------------ | ------- | ----- | ------------------- | --- | --- | --- | --- | --- | --- | --- | --- |
+q from five to ten. For the large problem instances, the number of jobs
+| and | q, respectively, | and let | =C  | (   | ) C | ( ). The | prob- |     |     |     |     |     |     |
+| --- | ---------------- | ------- | --- | --- | --- | -------- | ----- | --- | --- | --- | --- | --- | --- |
+q q max q max q variesfrom15to30andthenumberofmachinesvariesfromfiveto15.
+| abilityofreplacing    |              | qwith q,giventhat |                         | >0,isexp( |              | /T),where |         |                          |     |     |     |     |     |
+| --------------------- | ------------ | ----------------- | ----------------------- | --------- | ------------ | --------- | ------- | ------------------------ | --- | --- | --- | --- | --- |
+|                       |              |                   |                         | q         |              | q         |         |                          |     |     |     |     |     |
+| T is the current      | temparature. |                   | This replacement        |           | is performed |           | by gen- |                          |     |     |     |     |     |
+|                       |              |                   |                         |           |              |           |         | 4.2. Parametersselection |     |     |     |     |     |
+| eratingarandomnumberr |              | U(0,              | 1),andreplacingsolution |           |              |           |         |                          |     |     |     |     |     |
+|                       |              |                   |                         |           |              |           | qwith q |                          |     |     |     |     |     |
+| ifr<exp(              | /T).         | 0,                |                         |           |              |           |         |                          |     |     |     |     |     |
+q If q the probability of replacing q with q is ThefivekeyparametersoftheproposedMSA-BSTare p,T 0,I iter,
+1.0. andN non improving,where pistheinitialsolutionsetsize;T 0denotesthe
+If q isbetterthantheincumbentbestsolution best foundsofar,it initialtemperature;I representsthenumberofiterationsataparti-
+iter
+willreplace bestandalocalsearch(LS)procedure,asdepictedinFig.5, culartemperature; representsthecoolingrate,andN improvingisthe
+non
+willbeperformed.AsshowninFig.5,theLSprocedureimproves best maximum number of consecutive temperature reductions over which
+byiterativelyexchangingjobsinthesolutionwithjobspositionedafter
+thebestvalueoftheobjectivefunctionthathasbeenobtainedsofarhas
+| them.T isreducedafterI |     | iteriterationsfromthelastreduction,usingthe |     |     |     |     |     |     |     |     |     |     |     |
+| ---------------------- | --- | ------------------------------------------- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+notbeenimproved.AsshowninTable2,eachofthefiveparameters
+| formulaT | T,where0< | <1.Iftheincumbentbestsolution, |     |     |     |     | best, |                 |               |             |              |     |           |
+| -------- | --------- | ------------------------------ | --- | --- | --- | --- | ----- | --------------- | ------------- | ----------- | ------------ | --- | --------- |
+|          |           |                                |     |     |     |     |       | has four levels | so the number | of possible | combinations | of  | parameter |
+isnotimprovedinN improvingsuccessivetemperaturereductions,then valuesis45.Inordertomoreeffectivelydeterminethebestcombina-
+non
+| the algorithm | is terminated. |     | Upon the | termination | of  | the MSA-BST |     |     |     |     |     |     |     |
+| ------------- | -------------- | --- | -------- | ----------- | --- | ----------- | --- | --- | --- | --- | --- | --- | --- |
+tionofthefiveparametervalues,TypeBoftheTaguchiL16orthogonal
+procedure,the(near)globaloptimalscheduleisobtained.
+|     |     |     |     |     |     |     |     | experiment                                           | design, which | involves 16 | parameter | combinations | (see |
+| --- | --- | --- | --- | --- | --- | --- | --- | ---------------------------------------------------- | ------------- | ----------- | --------- | ------------ | ---- |
+|     |     |     |     |     |     |     |     | https://www.york.ac.uk/depts/maths/tables/l16b.htm), |               |             |           | is applied   | to   |
+4. Experimentalresults five randomly selected test instances (La08, LA15, LA23, Swv04 and
+|     |     |     |     |     |     |     |     | La36). For | each parameter | combination,the | proposed | MSA-BST | algo- |
+| --- | --- | --- | --- | --- | --- | --- | --- | ---------- | -------------- | --------------- | -------- | ------- | ----- |
+Thissectiondiscussesthecomputationalresultsthatareobtainedby rithm is executed independently 30 times to each of five selected in-
+applyingtheproposedMSA-BSTalgorithmandthreeotheralgorithms stances.Tables2and3presenttheaveragerelativepercentagedevia-
+forcomparison–CLLM(Zhuetal.,2009),MCLM(Zhu&Li,2012),and tion(ARPD)fromthebestsolutionastheresponsevariable.
+J |nwt|C
+HABC (Sundar et al., 2017)–to solve the m max. To verify the Table3presentsthesignificancevalueofeachparameter.Themost
+significantofthefiveparametersisN
+performanceofthebi-directionalshifttimetablingprocedure,itscom- non improving,whichhasthelargest
+putational results are compared with those obtained using the total rangeofARPD.Accordingtotheexperimentalresults,thequalityofthe
+enumerationmethodwithforwardandbackwarddecoding,denotedas solutionincreaseswiththecomputingtimethatisusedtoexecutethe
+TEM_F and TEM_B, respectively. The proposed methods are im- proposed MSA-BST algorithm. To balance computational time with
+plemented in C++ on an Intel® Core™ i7-920 processor that runs at solution quality, P size, T 0, I iter, and N non improving are set to 5, 50.0,
+6
+
+K.-C.YingandS.-W.Lin Computers & Industrial Engineering 146 (2020) 106615
+Table5
+Comparisonofresultsobtainedbycomparedalgorithms(large-sizedtestproblems).
+|     |     |     | CLLM |     | MCLM |     |     | HABC |     |     |     | MSA-BST |     |     |
+| --- | --- | --- | ---- | --- | ---- | --- | --- | ---- | --- | --- | --- | ------- | --- | --- |
+Problem (n,m) BKS BRPD APRD ACT BRPD APRD ACT Cmax BRPD ARPD ACT Cmax BRPD ARPD ACT
+La06 (15,5) 1248 0.00 2.80 185 0.00 0.75 63 1248 0.00 0.00 28 1248 0.00 0.00 49
+La07 (15,5) 1172 0.00 2.47 153 0.51 2.46 58 1172 0.00 0.92 63 1172 0.00 0.00 47
+La08 (15,5) 1244 0.00 2.25 176 0.00 0.47 56 1244 0.00 0.15 60 1244 0.00 1.03 65
+La09 (15,5) 1358 0.00 1.47 163 0.52 0.73 74 1362 0.29 0.67 24 1358 0.00 0.46 51
+La10 (15,5) 1287 0.00 0.70 141 0.00 0.04 48 1294 0.54 0.70 46 1287 0.00 0.22 57
+La11 (20,5) 1621 3.08 5.86 314 0.87 2.49 308 1627 0.37 1.05 182 1621 0.00 1.53 191
+La12 (20,5) 1425 1.89 5.69 350 0.28 2.48 416 1434 0.63 1.89 119 1425 0.00 2.26 184
+La13 (20,5) 1580 2.78 5.13 449 1.58 2.63 213 1580 0.00 1.27 156 1598 1.14 2.73 199
+La14 (20,5) 1610 5.03 6.89 326 2.36 3.81 220 1640 1.86 2.68 110 1610 0.00 1.67 167
+La15 (20,5) 1679 0.89 4.17 340 0.36 1.99 298 1679 0.00 0.80 169 1685 0.36 1.20 206
+La21 (15,10) 2030 0.89 3.64 215 0.89 1.00 55 2043 0.64 1.16 50 2030 0.00 0.52 110
+La22 (15,10) 1852 1.89 3.24 249 2.70 2.90 100 1852 0.00 0.75 64 1852 0.00 1.11 111
+La23 (15,10) 2021 0.54 3.81 216 0.05 2.02 35 2032 0.54 1.26 85 2021 0.00 1.43 129
+La24 (15,10) 1972 2.18 3.86 296 2.18 2.97 69 1994 1.12 2.16 69 1972 0.00 1.89 110
+La25 (15,10) 1906 0.58 3.41 209 1.26 2.66 50 1906 0.00 0.00 65 1906 0.00 0.49 120
+La26 (20,10) 2506 1.88 8.02 570 1.04 3.82 245 2506 0.00 2.18 157 2506 0.00 1.60 315
+La27 (20,10) 2666 3.04 6.45 586 1.83 3.33 272 2674 0.30 0.34 109 2666 0.00 0.49 289
+La28 (20,10) 2552 2.82 7.84 569 0.31 4.64 220 2560 0.31 3.46 139 2552 0.00 3.03 332
+La29 (20,10) 2300 8.22 10.39 546 2.91 5.53 312 2389 3.87 5.30 373 2300 0.00 3.42 332
+La30 (20,10) 2452 8.69 11.87 577 3.75 7.05 264 2452 0.00 5.43 174 2452 0.00 5.32 338
+La31 (30,10) 3369 11.16 15.28 1817 6.11 9.60 2176 3592 6.62 8.27 1205 3369 0.00 6.11 1316
+La32 (30,10) 3835 5.03 11.06 1894 0.00 5.62 2327 3913 2.03 4.66 1117 3859 0.63 3.35 1304
+La33 (30,10) 3413 9.84 12.57 1816 4.71 8.18 2109 3529 3.40 6.14 1084 3413 0.00 3.93 1352
+La34 (30,10) 3551 7.69 10.72 1934 3.75 6.74 2370 3610 1.66 4.72 987 3551 0.00 3.17 1276
+La35 (30,10) 3556 5.74 12.04 1836 3.99 7.08 2165 3593 1.04 5.30 1262 3556 0.00 3.42 1562
+La36 (15,15) 2685 0.00 3.46 376 1.90 4.98 133 2685 0.00 0.29 54 2685 0.00 0.50 166
+La37 (15,15) 2831 4.63 6.64 355 4.63 4.74 65 2938 3.78 5.65 129 2831 0.00 4.65 179
+La38 (15,15) 2525 3.64 5.98 349 0.00 1.85 64 2525 0.00 2.52 219 2525 0.00 2.31 159
+La39 (15,15) 2697 0.00 2.93 392 1.19 2.43 81 2703 0.22 0.88 103 2697 0.00 0.37 160
+La40 (15,15) 2580 0.54 5.00 199 0.00 0.00 43 2594 0.54 0.54 134 2580 0.00 0.52 135
+Swv01 (20,10) 2318 0.43 3.06 450 0.65 0.80 362 2318 0.00 0.41 614 2328 0.43 0.80 376
+Swv02 (20,10) 2417 0.04 3.14 546 0.04 0.42 343 2417 0.00 0.02 675 2417 0.00 0.00 358
+Swv03 (20,10) 2381 1.43 4.29 532 0.00 1.01 363 2381 0.00 0.49 715 2381 0.00 1.01 448
+Swv04 (20,10) 2462 3.25 4.07 474 0.00 2.09 299 2506 1.79 2.08 1214 2463 0.04 1.94 391
+Swv05 (20,10) 2333 0.00 6.94 500 0.00 0.00 200 2333 0.00 0.00 376 2333 0.00 1.72 371
+Swv06 (20,15) 3278 2.99 5.46 798 0.40 2.09 525 3291 0.40 0.80 622 3278 0.00 0.91 562
+Swv07 (20,15) 3188 2.60 4.17 826 1.63 0.97 410 3188 0.00 0.00 582 3188 0.00 0.28 564
+Swv08 (20,15) 3423 3.13 6.17 807 0.00 0.85 290 3423 0.00 1.29 808 3423 0.00 2.09 577
+Swv09 (20,15) 3246 1.88 3.57 739 0.74 1.59 315 3246 0.00 1.00 1075 3246 0.00 0.87 517
+Swv10 (20,15) 3451 1.07 3.28 802 0.00 1.19 365 3462 0.32 0.85 1001 3465 0.41 1.23 474
+Average 2.74 5.74 601 1.33 2.90 459 0.81 1.95 405 0.08 1.74 391
+*NewBestKnownSolutionbestinbold.
+| Table6 |     |     |     |     |     |     | 4.3. | Resultsanddiscussion |     |     |     |     |     |     |
+| ------ | --- | --- | --- | --- | --- | --- | ---- | -------------------- | --- | --- | --- | --- | --- | --- |
+Kruskal-WallisTestforBRPDandARPD(small-sizedtestproblems).
+LikeCLLM,MCLMandHABC,theproposedMSA-BSTalgorithmis
+| .   |     | chi-squared |     |     | df  | p-Value |          |     |           |              |     |          |               |        |
+| --- | --- | ----------- | --- | --- | --- | ------- | -------- | --- | --------- | ------------ | --- | -------- | ------------- | ------ |
+|     |     |             |     |     |     |         | executed | 20  | times for | each problem |     | instance | using various | random |
+TestonBRDP 14.562 5 0.012410* seeds. Then, the best and average makespan values of each problem
+TestonARDP 15.977 5 0.006909* instance from 20 runs are compared. Since EM_F and EM_B are de-
+|               |            |        |       |                  |            |         | terministic |     | methods, both | of them | are | run only | once for | each test in- |
+| ------------- | ---------- | ------ | ----- | ---------------- | ---------- | ------- | ----------- | --- | ------------- | ------- | --- | -------- | -------- | ------------- |
+| * Significant | difference | exists | among | the six compared | algorithms | for the |             |     |               |         |     |          |          |               |
+small-sizedtestproblems. stance.ToverifytheperformanceoftheproposedMSA-BSTalgorithm,
+themakespanvaluesthatareobtainedusingthefourcomparedalgo-
+|     |     |     |     |     |     |     | rithms | for | each benchmark | instance |     | are compared | using | the relative |
+| --- | --- | --- | --- | --- | --- | --- | ------ | --- | -------------- | -------- | --- | ------------ | ----- | ------------ |
+Table7
+percentagedeviation(RPD)asfollows.
+Kruskal-WallisTestforBRPDandARPD(large-sizedtestproblems).
+|     |     | chi-squared |     |     | df  | p-Value |     | Ch  | CB    |     |     |     |     |     |
+| --- | --- | ----------- | --- | --- | --- | ------- | --- | --- | ----- | --- | --- | --- | --- | --- |
+|     |     |             |     |     |     |         |     | max | max   |     |     |     |     |     |
+|     |     |             |     |     |     |         | RPD | h = | ×100% |     |     |     |     |     |
+CB
+| TestonBRDP |     | 48.858 |     |     | 3   | <0.00001* |        |      | max                                             |     |     |     |     |     |
+| ---------- | --- | ------ | --- | --- | --- | --------- | ------ | ---- | ----------------------------------------------- | --- | --- | --- | --- | --- |
+| TestonARDP |     | 47.890 |     |     | 3   | <0.00001* |        |      |                                                 |     |     |     |     |     |
+|            |     |        |     |     |     |           | whereC | h    | andC B arethemakespanvaluesthatareobtainedusing |     |     |     |     |     |
+|            |     |        |     |     |     |           |        | m ax | m ax                                            |     |     |     |     |     |
+* Significantdifferenceexistsamongthefourcomparedalgorithmsforthe algorithmhandthebestknownsolution(BKS),respectively.
+large-sizedtestproblems. Sundaretal.(2017)implementedCLLM,MCLMandHABConaPC
+withaPentium4processor,whichdifferedfromtheprocessorthatwas
+12000n,0.96and1.0n,respectively,forlargeprobleminstances,where
+|           |            |     |             |              |           |           | used     | in this | study. Since | the    | computing    | times | vary            | with hardware, |
+| --------- | ---------- | --- | ----------- | ------------ | --------- | --------- | -------- | ------- | ------------ | ------ | ------------ | ----- | --------------- | -------------- |
+| n denotes | the number | of  | jobs. Since | the solution | spaces of | the small |          |         |              |        |              |       |                 |                |
+|           |            |     |             |              |           |           | software | and     | programming  | skill, | a completely |       | fair comparison | of the         |
+probleminstancesarerelativesmall,thecorrespondingparameterva-
+comparedalgorithms’efficienciescannotbemade.Thescoresthatwere
+luesaresettothoseusedforthelargeprobleminstances,exceptwith
+|     |         |     |     |     |     |     | measured | by  | the CPU | benchmarks |     | (http://www.cpubenchmark.net/ |     |     |
+| --- | ------- | --- | --- | --- | --- | --- | -------- | --- | ------- | ---------- | --- | ----------------------------- | --- | --- |
+| N   | setto2. |     |     |     |     |     |          |     |         |            |     |                               |     |     |
+non improving singleThread.html) are used to adjust the computational times of the
+7
+
+K.-C.YingandS.-W.Lin Computers & Industrial Engineering 146 (2020) 106615
+Table8
+ResultsforthetestproblemsofAdamsetal.(1988),YamadaandNakano(1992),andTaillard(1993).
+|     |     | M0  |     |     | M1  |     |     | M2  |     | M3  |     |     | M4  |     |     |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+Instance Size BKS Best Avg Time Best Avg Time Best Avg Time Best Avg Time Best Avg Time
+yn1 20*20 2362 2385 2439.05 1174.6 2385 2434.15 884.1 2362 2443.10 954.7 2385 2421.40 910.5 2390 2432.75 1101.0
+yn2 20*20 2312 2312 2388.45 1040.2 2312 2393.10 1016.5 2323 2403.55 1112.5 2349 2418.80 880.3 2323 2418.10 1161.0
+yn3 20*20 2299 2299 2380.40 1160.9 2324 2379.20 803.6 2299 2364.40 1064.1 2324 2350.50 906.2 2299 2374.05 954.2
+yn4 20*20 2458 2478 2528.50 1129.2 2478 2528.00 963.5 2474 2528.20 1030.3 2458 2516.60 1005.7 2489 2525.55 1090.2
+abz5 10*10 2170 2170 2176.75 4.2 2170 2176.75 4.2 2179 2179.30 4.5 2170 2173.60 5.3 2179 2179.00 5.1
+abz6 10*10 1718 1718 1734.10 3.8 1718 1731.80 4.0 1741 1741.00 5.6 1718 1732.95 4.4 1719 1739.90 5.6
+abz7 20*15 1563 1564 1617.00 789.7 1589 1619.70 805.2 1601 1620.05 824.9 1563 1611.10 847.3 1585 1619.65 865.5
+abz8 20*15 1616 1631 1654.15 758.4 1623 1659.30 726.1 1628 1659.65 877.5 1623 1649.30 737.7 1616 1643.95 968.5
+abz9 20*15 1562 1562 1615.95 771.7 1562 1610.05 765.0 1566 1605.15 858.1 1596 1617.90 783.7 1582 1616.60 791.2
+ta01 15*15 2674 2674 2690.30 257.8 2674 2703.80 190.1 2674 2683.30 238.8 2674 2709.00 211.8 2674 2682.55 220.4
+ta02 15*15 2646 2663 2669.70 221.7 2687 2704.30 194.9 2663 2666.10 191.4 2687 2705.30 239.2 2646 2662.00 220.3
+ta03 15*15 2600 2600 2609.45 212.1 2600 2611.40 191.2 2613 2619.05 230.1 2600 2605.50 220.7 2613 2615.55 201.4
+ta04 15*15 2500 2500 2542.85 246.9 2501 2545.25 178.4 2500 2552.85 221.1 2501 2546.65 220.7 2500 2549.40 214.8
+ta05 15*15 2600 2600 2657.80 281.6 2600 2658.05 232.2 2661 2670.60 212.3 2600 2647.10 245.0 2609 2662.70 220.2
+ta06 15*15 2549 2549 2575.35 189.3 2584 2584.00 159.6 2549 2612.15 228.2 2584 2584.00 156.3 2549 2606.25 206.3
+ta07 15*15 2684 2684 2723.05 254.7 2732 2747.65 249.4 2684 2721.25 278.9 2733 2747.35 223.3 2684 2719.10 223.7
+ta08 15*15 2634 2634 2686.40 216.8 2634 2710.00 235.5 2654 2671.80 202.1 2634 2712.80 232.9 2634 2674.65 214.1
+ta09 15*15 2637 2637 2638.65 184.0 2637 2637.00 162.7 2667 2694.05 202.3 2637 2637.00 170.8 2667 2696.60 209.5
+ta10 15*15 2614 2629 2661.30 212.2 2667 2672.60 206.9 2614 2653.65 222.5 2629 2665.60 172.9 2629 2666.35 210.4
+ta11 20*15 3041 3041 3146.15 647.1 3099 3182.65 594.8 3041 3161.40 688.7 3099 3186.45 600.8 3041 3169.15 666.9
+ta12 20*15 3350 3350 3451.75 626.3 3350 3463.75 592.2 3418 3474.60 683.5 3350 3451.35 578.2 3394 3469.15 752.4
+ta13 20*15 3028 3028 3145.05 596.4 3071 3102.75 647.7 3112 3214.45 757.9 3028 3100.45 573.2 3112 3209.35 605.5
+ta14 20*15 3126 3126 3215.20 626.9 3133 3230.85 600.5 3140 3212.15 666.2 3126 3227.85 607.6 3165 3215.95 638.6
+ta15 20*15 3064 3091 3140.50 663.7 3091 3142.20 599.3 3159 3242.30 785.0 3064 3135.80 564.7 3145 3245.75 638.4
+ta16 20*15 3288 3374 3419.85 611.3 3288 3407.00 524.7 3310 3397.90 658.2 3288 3447.40 609.4 3374 3400.40 711.8
+ta17 20*15 3247 3306 3440.90 738.1 3306 3418.40 643.6 3394 3467.05 682.1 3247 3423.10 548.2 3394 3456.45 684.1
+ta18 20*15 3240 3240 3312.95 671.1 3277 3334.55 630.4 3240 3354.05 643.0 3268 3345.55 640.6 3240 3340.35 704.8
+ta19 20*15 3099 3099 3224.05 626.5 3099 3246.50 694.5 3176 3213.40 671.7 3099 3267.45 647.4 3176 3245.50 690.1
+ta20 20*15 3254 3254 3340.70 639.8 3295 3378.15 579.8 3254 3335.35 595.6 3295 3379.15 626.2 3254 3307.20 627.9
+Avg 2627.5 2683.67 536.4 2637.4 2690.10 485.5 2644.7 2695.24 544.5 2632.0 2690.24 488.7 2644.2 2694.62 545.0
+| #ofBest |     | 20  |     |     | 12  |     |     | 10  |     | 16  |     |     | 11  |     |     |
+| ------- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+Table9 were0.27%,0.47%and0.51%,respectively.Theseresultsrevealthat
+Kruskal-WallisTestonBRPDandARPD(othertestproblems). the proposed MSA-BST algorithm outperforms the state-of-the-art al-
+|     |     |             |     |     |     |     |         | gorithms | insolving | the small | problem | instances. |     | It can be | found that |
+| --- | --- | ----------- | --- | --- | --- | --- | ------- | -------- | --------- | --------- | ------- | ---------- | --- | --------- | ---------- |
+|     |     | chi-squared |     |     | df  |     | p-Value |          |           |           |         |            |     |           |            |
+TEM_FandTEM_Bareunabletoobtainthebestsolutionforsomein-
+TestonBRDP 6.6835 4 0.1536 stances.Thatis,ifthestartingprocessingtimeofthefirstoperationofa
+TestonARDP 0.65194 4 0.9571 job is not delayed for one unit of time, the best solution cannot be
+|     |     |     |     |     |     |     |     | obtained, | even if | the TEM_F | and | TEM_B | are the | total enumeration |     |
+| --- | --- | --- | --- | --- | --- | --- | --- | --------- | ------- | --------- | --- | ----- | ------- | ----------------- | --- |
+methodforforwardandbackwardtimetabling.
+comparedalgorithmsinthisstudy,toaccountfortherelativespeedsof
+|     |     |     |     |     |     |     |     | Table | 5 presents | the BRPDs, | ARPDs | and | ACTs | that were | obtained |
+| --- | --- | --- | --- | --- | --- | --- | --- | ----- | ---------- | ---------- | ----- | --- | ---- | --------- | -------- |
+thedifferentprocessors.Therefore,thecomputationaltimesinTables4
+|     |     |     |     |     |     |     |     | using the | compared | algorithmsforthe |     | large | probleminstances. |     | Since |
+| --- | --- | --- | --- | --- | --- | --- | --- | --------- | -------- | ---------------- | --- | ----- | ----------------- | --- | ----- |
+and5areadjustedusingthefollowingformula.
+|     |     |     |     |     |     |     |     | neither TEM_F | nor | TEM_B | can obtain | solutions |     | within a | reasonable |
+| --- | --- | --- | --- | --- | --- | --- | --- | ------------- | --- | ----- | ---------- | --------- | --- | -------- | ---------- |
+OriginalCPUtime×(scoreofoldcomputer/scoreofnewcomputer) computational time, they are not listed in Table 4. For the 40 large
+probleminstances,theMSA-BST,CLLM,MCLMandHABCyielded34
+| where the   | new computer |            | is the one | that | was used | in this  | study to |             |         |               |          |          |              |           |         |
+| ----------- | ------------ | ---------- | ---------- | ---- | -------- | -------- | -------- | ----------- | ------- | ------------- | -------- | -------- | ------------ | --------- | ------- |
+|             |              |            |            |      |          |          |          | (34/40 =    | 85.0%), | 8 (8/40       | = 5.0%), | 8        | (8/40 =      | 5.0%) and | 18 (18/ |
+| execute the | MSA-BST      | algorithm, | yielding   |      | a score  | of 1165. | The old  |             |         |               |          |          |              |           |         |
+|             |              |            |            |      |          |          |          | 40 = 45.0%) | BKSs,   | respectively. |          | Clearly, | the proposed | MSA-BST   | al-     |
+computerwasusedbySundaretal.(2017)toexecutetheCLLM,MCLM gorithmobtainedthemostBKSsamongthefourcomparedalgorithms.
+andHABC,yieldingascoreof818. Among the 34 BKSs that found by MSA-BST, there are 15 new BKSs,
+Table4presentsthebestrelativepercentagedeviation(BRPD),the whicharenotfoundintheliterature.Thedetailsofallsolutionsthat
+average relative percentage deviation (ARPD) and the average CPU obtained by the proposed MSA-BST algorithm have been put on a
+timeinseconds(ACT)foreachofthe21smallprobleminstances.As website (http://swlin.cgu.edu.tw/data/nwjsp.zip). The total average
+| shown in | Table 4, | the MSA-BST | found | 21  | BKSs; | CLLM, MCLM | and |     |     |     |     |     |     |     |     |
+| -------- | -------- | ----------- | ----- | --- | ----- | ---------- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+BRPDofthe40largeprobleminstancesthatwasobtainedusingMSA-
+| HABC obtained | 20, | 16 and | 17 of | the 21 | BKSs, respectively. |     | Table 4 |     |     |     |     |     |     |     |     |
+| ------------- | --- | ------ | ----- | ------ | ------------------- | --- | ------- | --- | --- | --- | --- | --- | --- | --- | --- |
+BSTwas0.08%,whereasthecorrespondingvaluesthatwereobtained
+showsthatTEM_FandTEM_BcanfindtheBKSsfor16and13ofthe21
+|     |     |     |     |     |     |     |     | using CLLM, | MCLM | and | HABC were | 2.74%, | 1.33% | and | 0.81%, re- |
+| --- | --- | --- | --- | --- | --- | --- | --- | ----------- | ---- | --- | --------- | ------ | ----- | --- | ---------- |
+testproblems,respectively,supportingtheclaimthattheproposedbi-
+spectively.ThetotalARPDofthe40largeprobleminstanceswas1.74%
+| directional | shift timetabling |         | procedure   | can        | decode | better schedules |         |                  |               |         |            |             |       |            |            |
+| ----------- | ----------------- | ------- | ----------- | ---------- | ------ | ---------------- | ------- | ---------------- | ------------- | ------- | ---------- | ----------- | ----- | ---------- | ---------- |
+|             |                   |         |             |            |        |                  |         | for the proposed |               | MSA-BST | algorithm, | whereas     | for   | CLLM, MCLM | and        |
+| than the    | classical         | forward | timetabling | procedure. |        | The total        | average |                  |               |         |            |             |       |            |            |
+|             |                   |         |             |            |        |                  |         | HABC, the        | corresponding |         | values     | were 5.74%, | 2.90% | and        | 1.95%, re- |
+BRPDacrossthe21smallprobleminstancesthatwasobtainedusingthe spectively.Evidently,theproposedMSA-BSTalgorithmyieldedbetter
+proposed MSA-BST algorithm was 0.00%, whereas the corresponding solutions than the other best available algorithms for large problem
+| values that | were | obtained | using | CLLM, | MCLM, HABC, | TEM_F | and | instances. |     |     |     |     |     |     |     |
+| ----------- | ---- | -------- | ----- | ----- | ----------- | ----- | --- | ---------- | --- | --- | --- | --- | --- | --- | --- |
+TEM_Bwere0.01%,0.41%,0.23%,0.23%and0.38%,respectively.The ToconfirmthattheMSA-BSTalgorithmsignificantlyoutperformed
+totalARPDofthe21smallprobleminstancesthatwasobtainedusing theCLLM,MCLM,HABC,TEM_FandTEM_Balgorithms,Kruskal-Wallis
+| the proposed | MSA-BST | algorithm |     | was 0.08%, | whereas | the | corre- |     |     |     |     |     |     |     |     |
+| ------------ | ------- | --------- | --- | ---------- | ------- | --- | ------ | --- | --- | --- | --- | --- | --- | --- | --- |
+testswereperformedintermsofBRPDandtotalARPD.Theanalytical
+| sponding | values that | were | obtained | using | CLLM, | MCLM and | HABC |     |     |     |     |     |     |     |     |
+| -------- | ----------- | ---- | -------- | ----- | ----- | -------- | ---- | --- | --- | --- | --- | --- | --- | --- | --- |
+8
+
+K.-C.YingandS.-W.Lin Computers & Industrial Engineering 146 (2020) 106615
+resultsinTable6indicatethat,ataconfidencelevelof =0.05,there References
+are significant differences among 6 heuristics for the BRPD and total
+ARPD for small problem instances. The analytical results in Table 7 Adams,J.,Balas,E.,&Zawack,D.(1988).Theshiftingbottleneckprocedureforjobshop
+indicate that, at a confidence level of =0.05, there are significant scheduling.ManagementScience,34,391–401.
+AitZai,A.,Benmedjdoub,B.,&Boudhar,M.(2016).Branch-and-boundandPSOalgo-
+differencesamongthefourcomparedalgorithmsfortheBRPDandtotal
+rithmsforno-waitjobshopscheduling.JournalofIntelligentManufacturing,27,
+ARPDwithrespecttolargerprobleminstances. 679–688.
+To verify the effectiveness of the forward/backward and with/ Allahverdi,A.(2016).Asurveyofschedulingproblemswithno-waitinprocess.European
+JournalofOperationalResearch,255,6658–6686.
+without 1 time-unit delay shift timetabling methods, another 29 in-
+Bansal,N.,Mahdian,M.,&Sviridenko,M.(2005).Minimizingmakespaninno-waitjob
+stance problems are used. The instances abz5-abz9 are taken from shops.MathematicsofOperationsResearch,30,817–831.
+Adams,Balas,andZawack(1988),yn1-yn4aretakenfromYamadaand Beasley,J.E.(1990).Or-library:Distributiontestproblemsbyelectronicmail.Journalof
+theOperationalResearchSociety,41,1069–1072.
+Nakano(1992),andtai01-tai20aretakenfromTailard(1988).Table8
+Bożejko,W.,&Makuchowski,M.(2009).Afasthybridtabusearchalgorithmfortheno-
+showstheresultsobtainedforthesetestproblems.Tofurtherconfirm waitjobshopproblem.ComputerandIndustrialEngineering,56,1502–1509.
+the effectiveness of the forward/backward, with/without 1 time-unit Bożejko,W.,&Makuchowski,M.(2011).Solvingtheno-waitjob-shopproblembyusing
+delay shift timetabling methods, Kruskal-Wallis tests were applied to geneticalgorithmwithautomaticadjustment.InternationalJournalAdvanced
+ManufacturingTechnology,57,735–752.
+M0,M1,M2,M3andM4,whereM0denotestheproposedMSA-BSTal- Bozejko,W.,&Wodecki,M.(2006).Newconceptsinneighborhoodsearchforpermu-
+gorithm, M1 denotes the MSA algorithm with the forward non-delay tationoptimizationproblems.InE.K.Burke,&H.Rudová(Eds.).PATAT2006(pp.
+timetabling procedure, M2 denotes theMSAalgorithmwiththe back- 363–366). ISBN80-210-3726-1.
+Brizuela,C.A.,Zhao,Y.,&Sannomiya,N.(2001).No-waitandblockingjob-shops:
+wardnon-delaytimetablingprocedure,M3denotestheMSAalgorithm
+ChallengingproblemsforGA’s.IEEEinternationalconferenceonsystems,man,and
+withtheforwarddelaytimetablingprocedure,andM4denotestheMSA cybernetics(pp.2349–2354).NewYork:IEEE.
+algorithmwiththebackwarddelaytimetablingprocedure.Theanaly- Chen,J.F.(2006).Approachesforthevehicleroutingproblemwithsimultaneousde-
+ticalresultsinTable9indicatethat,ataconfidencelevelof =0.05, liveriesandpickups.JournaloftheChineseInstituteofIndustrialEngineers,23,
+141–150.
+thereisnosignificantdifferenceamongtheforward/backward,with/ Framinan,J.M.,&Schuster,C.J.(2006).Anenhancedtimetablingprocedurefortheno-
+without 1 time-unit delay shift timetabling methods. However, the waitjobshopproblem:Acompletelocalsearchapproach.ComputersandOperations
+Research,331,1200–1213.
+proposed MSA-BST (M0) obtained the highest number of best-known
+Fisher,R.A.,&Yates,F.(1948).Statisticaltablesforbiological,agriculturalandmedical
+solutions,comparedwithitsvariants(i.e.,M1,M2,M3andM4). research(3rded.).London:Oliver&Boyd26–27.
+Hall,N.,&Sriskandarajah,C.(1996).Asurveyonmachineschedulingproblemswith
+blockingandno-waitinprocess.OperationsResearch,44,510–525.
+5. Conclusionsandrecommendationsforfuturestudies
+Kirkpatrick,S.,Gelatt,C.D.,Jr.,&Vecchi,M.P.(1993).Optimizationbysimulated
+annealing.Science,220,671–680.
+This studyproposed an effective MSA-BST algorithm for solving the Li,X.,Xu,H.,&Li,M.(2016).Amemory-basedcompletelocalsearchmethodwith
+J m |nwt|C max problem,whichisachallengingtaskthathasreceivedlittle variableneighborhoodstructuresforno-waitjobshops.InternationalJournal
+AdvancedManufacturingTechnology,87,1401–1408.
+attention.TheproposedMSA-BSTalgorithmutilizesabi-directionalshift Lin,S.W.,&Ying,K.C.(2015).Amulti-pointsimulatedannealingheuristicforsolving
+timetabling procedure to enlarge the search space and thus find better multiple-objectiveunrelatedparallelmachineschedulingproblem.International
+solutions. The computational results that were obtained using a set of JournalofProductionResearch,53,1065–1076.
+Mascis,A.,&Pacciarelli,D.(2002).Job-shopschedulingwithblockingandno-wait
+benchmarkinstancesverifythesuperiorityoftheMSA-BSTalgorithmover
+constraints.EuropeanJournalofOperationalResearch,143,498–517.
+thebestexistingmeta-heuristicintheliterature.TheproposedMSA-BST Metropolis,N.,Rosenbluth,A.W.,Rosenbluth,M.N.,Teller,A.H.,&Teller,E.(1953).
+algorithm yields BKSs for all small problem instances and 34 out of 40 Equationsofstatecalculationsbyfastcomputingmachines.JournalofChemical
+Physics,21,1087–1092.
+large problem instances. Also, MSA-BST yields new BKSs for 15 of the
+Ozolins,A.(2018).Anewexactalgorithmforno-waitjobshopproblemtominimize
+instancesthatarenotfoundintheliterature.Theaboveexperimentsin- makespan.OperationalResearch-AnInternationalJournal.https://doi.org/10.1007/
+dicate that the proposed MSA-BST algorithm is a new and effective al- s12351-018-0414-1.
+ternativealgorithmforsolvingtheJ m |nwt|C max problem. Pan,J.C.H.,&Huang,H.C.(2009).Ahybridgeneticalgorithmforno-waitjobshop
+schedulingproblems.ExpertSystemswithApplications,36,5800–5806.
+AfewinterestingrelevanttopicsconcerningNWJSPsremainopen. Santosa,B.,Budiman,M.F.,&Wiratno,S.E.(2011).Acrossentropy-geneticalgorithm
+First, this work could be extended by trying to find an improved form-machinesno-waitjob-shopschedulingproblem.JournalofIntelligentLearning
+timetablingprocedurefortheJ m |nwt|C maxproblem.Second,developing SystemsandApplications,3,171–180.
+Schuster,C.J.(2006).No-waitjobshopscheduling:Tabusearchandcomplexityof
+other meta-heuristics for solving the J m |nwt|C max problem would be subproblems.MathematicalMethodsofOperationsResearch,63,473–491.
+valuable. Third, more NWJSPs with alternative objective functions or Schuster,C.J.,&Framinan,J.(2003).Approximateproceduresforno-waitjobshop
+multi-objectivefunctionsmustbeaddressed.Fourth,moreresearchon scheduling.OperationsResearchLetters,31,308–318.
+Sundar,S.,Suganthan,P.N.,Jin,C.T.,Xiang,C.T.,&Soon,C.C.(2017).Ahybrid
+NWJSPswithotherperformancemetricsisrequired.Finally,complex artificialbeecolonyalgorithmforthejob-shopschedulingproblemwithno-wait
+problemslikestochasticanddynamicNWJSPswarrantinvestigation. constraint.SoftComputing,21,1193–1202.
+Taillard,E.(1993).Benchmarksforbasicschedulingproblems.EuropeanJournalof
+OperationalResearch,64,278–285.
+CRediTauthorshipcontributionstatement
+Valenzuela,V.M.,Brizuela,C.A.,Cosío-León,M.A.,&Romero-Ocaño,A.D.(2019).A
+combinationoftwosimpledecodingstrategiesfortheno-waitjobshopscheduling
+Kuo-Ching Ying: Conceptualization, Writing - review & editing, problem.InM.López-Ibáñez(Ed.).Proceedingsofthegeneticandevolutionarycom-
+putationconference(GECCO'19)(pp.864–871).NewYork,NY,USA:ACM.
+Writing - original draft. Shih-Wei Lin: Supervision, Software,
+Vermeulen,H.,Hoogeveen,H.,&vandenAkker,M.(2011).Solvingtheno-waitjobshop
+Validation. problem:AnILPandCPapproach.ProceedingsofBelgian/Netherlandsartificialin-
+telligenceconference(pp.1–8)..
+Yamada,T.,&Nakano,R.(1992).Ageneticalgorithmapplicabletolarge-scalejob-shop
+Acknowledgment
+instances.InR.Manner,&B.Manderick(Eds.).Parallelinstancesolvingfromnature2
+(pp.281–290).North-Holland.
+The work of S.-W. Lin was supported in part by the Ministry of Zhu,J.,&Li,X.(2012).Aneffectivemeta-heuristicforno-waitjobshopstominimize
+makespan.IEEETransactionsonAutomationScienceandEngineering,9,189–198.
+ScienceandTechnology,Taiwan,underGrantMOST107-2410-H-182-
+Zhu,J.,Li,X.,&Wang,Q.(2009).Completelocalsearchwithlimitedmemoryalgorithm
+005-MY2, and in part by the Linkou Chang Gung Memorial Hospital forno-waitjobshopstominimizemakespan.EuropeanJournalofOperational
+underGrantBMRPA19.TheworkoftheK-CYingispartiallysupported Research,198,378–386.
+by the Ministry of Science and Technology of the Republic of China,
+Taiwan,underGrantMOST108-2221-E-027-025.
+9
